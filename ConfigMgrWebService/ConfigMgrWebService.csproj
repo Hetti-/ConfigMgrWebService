@@ -97,6 +97,7 @@
     <Compile Include="ADOrganizationalUnit.cs" />
     <Compile Include="CMApplication.cs" />
     <Compile Include="CMCollection.cs" />
+    <Compile Include="CMDevice.cs" />
     <Compile Include="CMOSImage.cs" />
     <Compile Include="CMResource.cs" />
     <Compile Include="CMUserDeviceRelation.cs" />

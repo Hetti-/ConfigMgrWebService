@@ -554,6 +554,50 @@ namespace ConfigMgrWebService
             return returnValue;
         }
 
+        [WebMethod(Description = "Get a List of CMDevices by Name (with wildcards)")]
+        public List<CMDevice> GetCMDevicesByName(string secret, string serialNumber)
+        {
+            MethodBase method = MethodBase.GetCurrentMethod();
+            MethodBegin(method);
+
+            //' Variable for return value
+            //string returnValue = string.Empty;
+            List<CMDevice> returnValue = new List<CMDevice>();
+
+            //' Validate secret key
+            if (secret == secretKey)
+            {
+                //' Connect to SMS Provider
+                SmsProvider smsProvider = new SmsProvider();
+                WqlConnectionManager connection = smsProvider.Connect(siteServer);
+
+                //' Query for device name
+                string query = String.Format("SELECT * FROM SMS_R_System WHERE Name like '%{0}%'", serialNumber);
+                IResultObject result = connection.QueryProcessor.ExecuteQuery(query);
+
+                if (result != null)
+                {
+                    foreach (IResultObject device in result)
+                    {
+                        string deviceName = device["Name"].StringValue;
+                        string resourceID = device["ResourceID"].StringValue;
+                        string smsbiosguid = device["SMBIOSGUID"].StringValue;
+                        string[] macaddresses = device["MACAddresses"].StringArrayValue;
+                        string[] SystemOUName = device["SystemOUName"].StringArrayValue;
+                        string LastLogonUserName = device["LastLogonUserName"].StringValue;
+
+
+                        CMDevice deviceObject = new CMDevice { DeviceName = deviceName, ResourceID = resourceID, SMBIOSGUID = smsbiosguid, MACAddresses = macaddresses, LastLogonUserName = LastLogonUserName, SystemOUName = SystemOUName };
+                        returnValue.Add(deviceObject);
+
+                    }
+                }
+            }
+
+            MethodEnd(method);
+            return returnValue;
+        }
+
         [WebMethod(Description = "Get the UUID (SMBIOS GUID) of a specific device by name")]
         public string GetCMDeviceUUIDByName(string secret, string computerName)
         {
